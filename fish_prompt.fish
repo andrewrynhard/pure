@@ -11,17 +11,18 @@ set -gx VIRTUAL_ENV_DISABLE_PROMPT 1
 
 # Symbols
 
-__pure_set_default pure_symbol_prompt "❯"
+__pure_set_default pure_symbol_prompt "⟩"
 __pure_set_default pure_symbol_git_down_arrow "⇣"
 __pure_set_default pure_symbol_git_up_arrow "⇡"
 __pure_set_default pure_symbol_git_dirty "*"
 __pure_set_default pure_symbol_horizontal_bar "—"
+__pure_set_default pure_symbol_vertical_bar "¦"
 
 # Colors
 
 __pure_set_default pure_color_red (set_color red)
-__pure_set_default pure_color_green (set_color green)
-__pure_set_default pure_color_blue (set_color blue)
+__pure_set_default pure_color_green (set_color F92672)
+__pure_set_default pure_color_blue (set_color AE81FF)
 __pure_set_default pure_color_yellow (set_color yellow)
 __pure_set_default pure_color_cyan (set_color cyan)
 __pure_set_default pure_color_gray (set_color 93A1A1)
@@ -56,11 +57,7 @@ function fish_prompt
   set -l git_arrows ""
   set -l command_duration ""
   set -l prompt ""
-
-  # Do not add a line break to a brand new session
-  if test $__pure_fresh_session -eq 0
-    set prompt $prompt "\n"
-  end
+  set -l kube_context ""
 
   # Check if user is in an SSH session
   if [ "$SSH_CONNECTION" != "" ]
@@ -139,12 +136,18 @@ function fish_prompt
   if test -n "$CMD_DURATION"
     set command_duration (__format_time $CMD_DURATION $pure_command_max_exec_time)
   end
-  set prompt $prompt "$pure_color_yellow$command_duration$pure_color_normal\n"
+  set prompt $prompt "$pure_color_yellow$command_duration$pure_color_normal$pure_symbol_vertical_bar$pure_color_yellow "
 
   # Show python virtualenv name (if activated)
   if test -n "$VIRTUAL_ENV"
     set prompt $prompt $pure_color_gray(basename "$VIRTUAL_ENV")"$pure_color_normal "
   end
+
+  if test -n "kubectl"
+    set kube_context (kubectl config current-context)
+  end
+
+  set prompt $prompt "$kube_context $pure_color_yellow$command_duration$pure_color_normal"
 
   set prompt $prompt "$color_symbol$pure_symbol_prompt$pure_color_normal "
 
