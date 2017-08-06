@@ -136,7 +136,7 @@ function fish_prompt
   if test -n "$CMD_DURATION"
     set command_duration (__format_time $CMD_DURATION $pure_command_max_exec_time)
   end
-  set prompt $prompt "$pure_color_yellow$command_duration$pure_color_normal$pure_symbol_vertical_bar$pure_color_yellow "
+  set prompt $prompt "$pure_color_yellow$pure_color_normal$pure_symbol_vertical_bar$pure_color_yellow "
 
   # Show python virtualenv name (if activated)
   if test -n "$VIRTUAL_ENV"
