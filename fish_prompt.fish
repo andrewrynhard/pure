@@ -59,6 +59,7 @@ function fish_prompt
     set -l prompt ""
     set -l terraform_workspace ""
     set -l kube_context ""
+    set -l kube_namespace ""
 
     # Check if user is in an SSH session
     if [ "$SSH_CONNECTION" != "" ]
@@ -149,10 +150,13 @@ function fish_prompt
     set prompt $prompt "$pure_color_yellow$pure_color_normal$pure_symbol_vertical_bar$pure_color_yellow "
 
     if test -n "kubectl"
-        set kube_context (kubectl config current-context)
+        set kube_config_current_context (kubectl config current-context)
+        set kube_config_output (kubectl config get-contexts | grep (echo $kube_config_current_context))
+        set kube_context (echo $kube_config_output | grep (echo $kube_config_current_context) | tr -s ' ' | cut -d ' ' -f2)
+        set kube_namespace (echo $kube_config_output | grep (echo $kube_config_current_context) | tr -s ' ' | cut -d ' ' -f5)
     end
 
-    set prompt $prompt "$pure_color_cyan$kube_context$pure_color_normal $pure_color_yellow$command_duration$pure_color_normal"
+    set prompt $prompt "$pure_color_cyan$kube_context $kube_namespace$pure_color_normal $pure_color_yellow$command_duration$pure_color_normal"
 
     set prompt $prompt "$color_symbol$pure_symbol_prompt$pure_color_normal "
 
